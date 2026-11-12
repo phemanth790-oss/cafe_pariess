@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17251f">
+  <title>Cafe Paris | Staff Attendance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="app-shell" class="app-shell">
+    <aside class="sidebar">
+      <div class="side-brand"><div class="brand-mark small">CP</div><div><strong>Cafe Paris</strong><span>STAFF PORTAL</span></div></div>
+      <p class="nav-label">WORKSPACE</p>
+      <nav class="main-nav" aria-label="Main navigation">
+        <button class="nav-link active" data-page="dashboard"><span class="nav-icon">⌂</span> Overview</button>
+        <button class="nav-link" data-page="attendance"><span class="nav-icon">▦</span> Attendance</button>
+        <button class="nav-link" data-page="staff"><span class="nav-icon">♙</span> Staff members</button>
+        <button class="nav-link" data-page="reports"><span class="nav-icon">▤</span> Monthly reports</button>
+      </nav>
+      <div class="sidebar-bottom"><div class="help-note"><span class="status-dot"></span><div><strong>All systems ready</strong><small>Your data is saved locally</small></div></div><div class="logout-btn">☕ &nbsp; Welcome to Cafe Paris</div></div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar"><div class="mobile-brand"><span class="brand-mark tiny">CP</span><strong>Cafe Paris</strong></div><div class="topbar-right"><span class="today-label" id="top-date"></span><div class="avatar">CP</div><span class="owner-label" id="owner-name">Cafe Paris Team</span></div></header>
+      <div class="page-wrap">
+        <section id="page-dashboard" class="page active">
+          <div class="page-heading"><div><p class="eyebrow">YOUR WORKSPACE</p><h1>Welcome to Cafe Paris</h1><p class="muted">Here’s what’s happening at Cafe Paris today.</p></div><button class="btn btn-primary" data-goto="attendance">Take attendance <span>→</span></button></div>
+          <div class="stats-grid">
+            <article class="stat-card"><div class="stat-top"><span>Total active staff</span><span class="stat-icon green">♙</span></div><strong id="stat-staff">0</strong><small>Currently on your team</small></article>
+            <article class="stat-card"><div class="stat-top"><span>Present today</span><span class="stat-icon mint">✓</span></div><strong id="stat-present">0</strong><small>Marked present</small></article>
+            <article class="stat-card"><div class="stat-top"><span>Absent today</span><span class="stat-icon rose">–</span></div><strong id="stat-absent">0</strong><small>Marked absent</small></article>
+            <article class="stat-card"><div class="stat-top"><span>This month · present</span><span class="stat-icon gold">◷</span></div><strong id="stat-month">0</strong><small>Recorded present days</small></article>
+          </div>
+          <div id="launch-banner" class="notice hidden"><span class="notice-icon">📅</span><div><strong>Attendance starts 10 December 2026</strong><p>You can prepare staff profiles now. Attendance marking will become available on the start date.</p></div></div>
+          <div id="closed-banner" class="notice hidden"><span class="notice-icon">☕</span><div><strong>Monday — shop closed</strong><p>No attendance can be recorded on Mondays.</p></div></div>
+          <div class="content-grid">
+            <article class="panel"><div class="panel-heading"><div><h2>Today’s attendance</h2><p class="muted">A quick look at the team</p></div><button class="text-btn" data-goto="attendance">View attendance →</button></div><div id="today-list" class="today-list"><div class="empty-state">Loading team attendance…</div></div></article>
+            <article class="panel review-panel"><div class="panel-heading"><div><h2>Monthly review</h2><p class="muted" id="review-month"></p></div><span class="review-symbol">✦</span></div><div class="review-number" id="review-total">0</div><p class="muted">Total recorded attendance marks this month.</p><div class="review-divider"></div><div class="review-row"><span>Present</span><strong id="review-present">0</strong></div><div class="review-row"><span>Absent</span><strong id="review-absent">0</strong></div><p class="review-tip">Your monthly summary can be reviewed whenever you need it.</p><button class="btn btn-outline full" data-goto="reports">Open monthly report</button></article>
+          </div>
+        </section>
+
+        <section id="page-attendance" class="page">
+          <div class="page-heading"><div><p class="eyebrow">DAILY RECORDS</p><h1>Attendance</h1><p class="muted">Attendance recording begins 10 December 2026. Mark and review your team’s attendance from that date.</p></div><div class="heading-control"><label class="sr-only" for="attendance-month">Attendance month</label><input id="attendance-month" type="month"></div></div>
+          <div id="attendance-closed" class="notice hidden"><span class="notice-icon">☕</span><div><strong>Shop closed on Mondays</strong><p>Mondays are automatically excluded from attendance marking.</p></div></div>
+          <article class="panel table-panel"><div class="panel-heading"><div><h2 id="attendance-title">Monthly attendance</h2><p class="muted">Choose Present or Absent for each eligible day.</p></div><span class="table-count" id="attendance-count">0 staff</span></div><div id="attendance-table" class="table-scroll"></div><p class="table-footnote">Dates before 10 December 2026, future dates, Mondays, and dates outside an employee’s working period cannot be marked. Blank cells remain unmarked.</p></article>
+        </section>
+
+        <section id="page-staff" class="page">
+          <div class="page-heading"><div><p class="eyebrow">YOUR PEOPLE</p><h1>Staff members</h1><p class="muted">Manage active and former Cafe Paris employees.</p></div><button id="add-staff-open" class="btn btn-primary">＋ Add staff member</button></div>
+          <article class="panel"><div class="panel-heading staff-heading"><div><h2>Team directory</h2><p class="muted">Employee details and working status.</p></div><div class="tabs"><button class="tab active" data-staff-status="active">Active staff</button><button class="tab" data-staff-status="former">Former staff</button></div></div><div id="staff-table" class="table-scroll"></div></article>
+        </section>
+
+        <section id="page-reports" class="page">
+          <div class="page-heading"><div><p class="eyebrow">INSIGHTS & RECORDS</p><h1>Monthly reports</h1><p class="muted">A clear summary of attendance by employee.</p></div><div class="heading-control"><label class="sr-only" for="report-month">Report month</label><input id="report-month" type="month"><button id="export-btn" class="btn btn-outline">↓ Export CSV</button></div></div>
+          <div class="report-summary" id="report-summary"></div>
+          <article class="panel table-panel"><div class="panel-heading"><div><h2>Employee summary</h2><p class="muted" id="report-subtitle"></p></div><span class="table-count" id="report-count">0 employees</span></div><div id="report-table" class="table-scroll"></div><p class="table-footnote">Only explicitly marked Present and Absent days are counted. Eligible Mondays are shown as shop-closed days.</p></article>
+        </section>
+      </div>
+      <footer class="app-footer">CAFE PARIS <span>·</span> STAFF ATTENDANCE MANAGEMENT</footer>
+    </main>
+  </div>
+
+  <div id="staff-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="staff-modal-title"><div class="modal-card"><button class="modal-close" data-close-modal aria-label="Close">×</button><p class="eyebrow">TEAM DIRECTORY</p><h2 id="staff-modal-title">Add a staff member</h2><p class="muted">Enter the employee’s details to create their profile.</p><form id="staff-form" class="form-stack"><label>Full name<input name="fullName" maxlength="100" required placeholder="Employee full name"></label><label>Joining date<input name="joiningDate" type="date" required></label><p id="staff-form-error" class="form-error" aria-live="polite"></p><div class="modal-actions"><button type="button" class="btn btn-outline" data-close-modal>Cancel</button><button type="submit" class="btn btn-primary">Save staff member</button></div></form></div></div>
+  <div id="leave-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="leave-modal-title"><div class="modal-card"><button class="modal-close" data-close-leave aria-label="Close">×</button><p class="eyebrow">STAFF STATUS</p><h2 id="leave-modal-title">Mark as former staff</h2><p class="muted" id="leave-staff-name"></p><form id="leave-form" class="form-stack"><label>Last working date<input name="lastWorkingDate" type="date" required></label><p class="form-hint">Existing attendance records will be retained.</p><p id="leave-form-error" class="form-error" aria-live="polite"></p><div class="modal-actions"><button type="button" class="btn btn-outline" data-close-leave>Cancel</button><button type="submit" class="btn btn-primary">Confirm</button></div></form></div></div>
+</body>
+</html>
