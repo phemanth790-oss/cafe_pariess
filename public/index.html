@@ -13,7 +13,21 @@
 </head>
 <body>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <div id="app-shell" class="app-shell">
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <div class="brand-mark">CP</div>
+      <p class="eyebrow">CAFE PARIS STAFF PORTAL</p>
+      <h1>Welcome back</h1>
+      <p class="muted">Enter the staff management password to continue.</p>
+      <form id="login-form" class="form-stack">
+        <label>Password<input name="password" type="password" autocomplete="current-password" minlength="16" required></label>
+        <p id="login-error" class="form-error" aria-live="polite"></p>
+        <button type="submit" class="btn btn-primary full">Sign in</button>
+      </form>
+      <p class="login-foot">CAFE PARIS · STAFF ATTENDANCE MANAGEMENT</p>
+    </div>
+  </div>
+  <div id="app-shell" class="app-shell hidden">
     <aside class="sidebar">
       <div class="side-brand"><div class="brand-mark small">CP</div><div><strong>Cafe Paris</strong><span>STAFF PORTAL</span></div></div>
       <p class="nav-label">WORKSPACE</p>
@@ -23,11 +37,11 @@
         <button class="nav-link" data-page="staff"><span class="nav-icon">♙</span> Staff members</button>
         <button class="nav-link" data-page="reports"><span class="nav-icon">▤</span> Monthly reports</button>
       </nav>
-      <div class="sidebar-bottom"><div class="help-note"><span class="status-dot"></span><div><strong>All systems ready</strong><small>Your data is saved locally</small></div></div><div class="logout-btn">☕ &nbsp; Welcome to Cafe Paris</div></div>
+      <div class="sidebar-bottom"><div class="help-note"><span class="status-dot"></span><div><strong>Atlas database</strong><small>Cloud data storage</small></div></div></div>
     </aside>
 
     <main class="main-area">
-      <header class="topbar"><div class="mobile-brand"><span class="brand-mark tiny">CP</span><strong>Cafe Paris</strong></div><div class="topbar-right"><span class="today-label" id="top-date"></span><div class="avatar">CP</div><span class="owner-label" id="owner-name">Cafe Paris Team</span></div></header>
+      <header class="topbar"><div class="mobile-brand"><span class="brand-mark tiny">CP</span><strong>Cafe Paris</strong></div><div class="topbar-right"><span class="today-label" id="top-date"></span><div class="avatar">CP</div><span class="owner-label" id="owner-name">Cafe Paris Team</span><button id="logout-btn" class="text-btn">Sign out</button></div></header>
       <div class="page-wrap">
         <section id="page-dashboard" class="page active">
           <div class="page-heading"><div><p class="eyebrow">YOUR WORKSPACE</p><h1>Welcome to Cafe Paris</h1><p class="muted">Here’s what’s happening at Cafe Paris today.</p></div><button class="btn btn-primary" data-goto="attendance">Take attendance <span>→</span></button></div>
@@ -66,7 +80,7 @@
     </main>
   </div>
 
-  <div id="staff-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="staff-modal-title"><div class="modal-card"><button class="modal-close" data-close-modal aria-label="Close">×</button><p class="eyebrow">TEAM DIRECTORY</p><h2 id="staff-modal-title">Add a staff member</h2><p class="muted">Enter the employee’s details to create their profile.</p><form id="staff-form" class="form-stack"><label>Full name<input name="fullName" maxlength="100" required placeholder="Employee full name"></label><label>Joining date<input name="joiningDate" type="date" required></label><p id="staff-form-error" class="form-error" aria-live="polite"></p><div class="modal-actions"><button type="button" class="btn btn-outline" data-close-modal>Cancel</button><button type="submit" class="btn btn-primary">Save staff member</button></div></form></div></div>
-  <div id="leave-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="leave-modal-title"><div class="modal-card"><button class="modal-close" data-close-leave aria-label="Close">×</button><p class="eyebrow">STAFF STATUS</p><h2 id="leave-modal-title">Mark as former staff</h2><p class="muted" id="leave-staff-name"></p><form id="leave-form" class="form-stack"><label>Last working date<input name="lastWorkingDate" type="date" required></label><p class="form-hint">Existing attendance records will be retained.</p><p id="leave-form-error" class="form-error" aria-live="polite"></p><div class="modal-actions"><button type="button" class="btn btn-outline" data-close-leave>Cancel</button><button type="submit" class="btn btn-primary">Confirm</button></div></form></div></div>
+  <div id="staff-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="staff-modal-title"><div class="modal-card"><button class="modal-close" data-close-modal aria-label="Close">×</button><p class="eyebrow">TEAM DIRECTORY</p><h2 id="staff-modal-title">Add a staff member</h2><p class="muted">Enter the employee’s details to create their profile.</p><form id="staff-form" class="form-stack"><label>Full name<input name="fullName" maxlength="100" required placeholder="Employee full name"></label><label>Joining date<input name="joiningDate" type="date" required></label><label>Staff management password<input name="password" type="password" autocomplete="current-password" minlength="16" required></label><p class="form-hint">Required to authorize staff changes.</p><p id="staff-form-error" class="form-error" aria-live="polite"></p><div class="modal-actions"><button type="button" class="btn btn-outline" data-close-modal>Cancel</button><button type="submit" class="btn btn-primary">Save staff member</button></div></form></div></div>
+  <div id="leave-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="leave-modal-title"><div class="modal-card"><button class="modal-close" data-close-leave aria-label="Close">×</button><p class="eyebrow">STAFF STATUS</p><h2 id="leave-modal-title">Mark as former staff</h2><p class="muted" id="leave-staff-name"></p><form id="leave-form" class="form-stack"><label>Last working date<input name="lastWorkingDate" type="date" required></label><label>Staff management password<input name="password" type="password" autocomplete="current-password" minlength="16" required></label><p class="form-hint">Attendance records will be retained.</p><p id="leave-form-error" class="form-error" aria-live="polite"></p><div class="modal-actions"><button type="button" class="btn btn-outline" data-close-leave>Cancel</button><button type="submit" class="btn btn-primary">Confirm</button></div></form></div></div>
 </body>
 </html>

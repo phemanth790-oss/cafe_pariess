@@ -12,11 +12,25 @@ const fmtDate = value => value ? new Date(`${value}T00:00:00`).toLocaleDateStrin
 const monthLabel = value => new Date(`${value}-01T00:00:00`).toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 
+function showLogin(message = '') {
+  state.user = null;
+  $('#app-shell').classList.add('hidden');
+  $('#login-screen').classList.remove('hidden');
+  $('#login-error').textContent = message;
+}
+
 async function api(url, options = {}) {
   const response = await fetch(url, { credentials: 'same-origin', ...options, headers: { ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...(options.headers || {}) } });
   const type = response.headers.get('content-type') || '';
   const data = type.includes('application/json') ? await response.json() : await response.text();
-  if (!response.ok) throw new Error(data?.error || data || 'Something went wrong.');
+  if (!response.ok) {
+    if (response.status === 401 && data?.error === 'Sign in to continue.' && state.user) {
+      showLogin('Your session expired. Sign in again.');
+    }
+    const error = new Error(data?.error || data || 'Something went wrong.');
+    error.status = response.status;
+    throw error;
+  }
   return data;
 }
 function toast(message, error = false) {
@@ -24,10 +38,11 @@ function toast(message, error = false) {
   clearTimeout(state.toastTimer); state.toastTimer = setTimeout(() => { el.className = 'toast'; }, 3000);
 }
 function initials(name) { return String(name || '?').trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase(); }
-function showApp(username) {
+function showApp() {
   state.user = 'Cafe Paris Team';
-  $('#owner-name').textContent = state.user; $('#welcome-name').textContent = state.user;
+  $('#owner-name').textContent = state.user;
   $('#app-shell').classList.remove('hidden');
+  $('#login-screen').classList.add('hidden');
   $('#top-date').textContent = new Date(`${today()}T12:00:00`).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
   $('#attendance-month').min = ATTENDANCE_START_MONTH; $('#report-month').min = ATTENDANCE_START_MONTH;
   $('#attendance-month').value = monthNow(); $('#report-month').value = monthNow();
@@ -137,14 +152,15 @@ $$('[data-close-modal]').forEach(button => button.addEventListener('click', () =
 $('#staff-modal').addEventListener('click', event => { if (event.target === $('#staff-modal')) $('#staff-modal').classList.add('hidden'); });
 $('#staff-form').addEventListener('submit', async event => {
   event.preventDefault(); const form = new FormData(event.currentTarget); $('#staff-form-error').textContent = '';
-  try { await api('/api/staff', { method: 'POST', body: JSON.stringify({ fullName: form.get('fullName'), joiningDate: form.get('joiningDate') }) }); $('#staff-modal').classList.add('hidden'); toast('Staff member added successfully.'); loadStaff(); }
+  try { await api('/api/staff', { method: 'POST', body: JSON.stringify({ fullName: form.get('fullName'), joiningDate: form.get('joiningDate'), password: form.get('password') }) }); $('#staff-form').reset(); $('#staff-modal').classList.add('hidden'); toast('Staff member added successfully.'); loadStaff(); }
   catch (error) { $('#staff-form-error').textContent = error.message; }
 });
 $$('[data-staff-status]').forEach(button => button.addEventListener('click', () => { state.staffStatus = button.dataset.staffStatus; $$('[data-staff-status]').forEach(tab => tab.classList.toggle('active', tab === button)); loadStaff(); }));
 $('#staff-table').addEventListener('click', event => {
   const button = event.target.closest('[data-leave-id]'); if (!button) return;
-  state.leaveStaffId = Number(button.dataset.leaveId);
+  state.leaveStaffId = button.dataset.leaveId;
   $('#leave-staff-name').textContent = `Set the final working date for ${button.dataset.leaveName}.`;
+  $('#leave-form').reset();
   const input = $('#leave-form [name="lastWorkingDate"]'); input.min = button.dataset.joining; input.max = today(); input.value = today(); $('#leave-form-error').textContent = '';
   $('#leave-modal').classList.remove('hidden');
 });
@@ -152,22 +168,52 @@ $$('[data-close-leave]').forEach(button => button.addEventListener('click', () =
 $('#leave-modal').addEventListener('click', event => { if (event.target === $('#leave-modal')) $('#leave-modal').classList.add('hidden'); });
 $('#leave-form').addEventListener('submit', async event => {
   event.preventDefault(); const form = new FormData(event.currentTarget); $('#leave-form-error').textContent = '';
-  try { await api(`/api/staff/${state.leaveStaffId}/leave`, { method: 'POST', body: JSON.stringify({ lastWorkingDate: form.get('lastWorkingDate') }) }); $('#leave-modal').classList.add('hidden'); toast('Staff status updated. Existing records were retained.'); loadStaff(); }
+  try { await api(`/api/staff/${state.leaveStaffId}/leave`, { method: 'POST', body: JSON.stringify({ lastWorkingDate: form.get('lastWorkingDate'), password: form.get('password') }) }); $('#leave-form').reset(); $('#leave-modal').classList.add('hidden'); toast('Staff status updated. Existing records were retained.'); loadStaff(); }
   catch (error) { $('#leave-form-error').textContent = error.message; }
 });
+$('#login-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  const form = new FormData(event.currentTarget);
+  $('#login-error').textContent = '';
+  try {
+    await api('/api/login', { method: 'POST', body: JSON.stringify({ password: form.get('password') }) });
+    $('#login-form').reset();
+    showApp();
+  } catch (error) {
+    $('#login-error').textContent = error.message;
+  }
+});
+$('#logout-btn').addEventListener('click', async () => {
+  try {
+    await api('/api/logout', { method: 'POST' });
+    $('#login-form').reset();
+    showLogin();
+    $('#login-form [name="password"]').focus();
+  } catch (error) {
+    toast(error.message, true);
+  }
+});
+async function initialize() {
+  try {
+    await api('/api/session');
+    showApp();
+  } catch (error) {
+    showLogin(error.status === 401 ? '' : error.message);
+  }
+}
 $('#attendance-table').addEventListener('change', async event => {
   const select = event.target.closest('.mark-select'); if (!select) return;
   const previous = select.dataset.previous || '';
   try {
     if (!select.value) {
-      await api('/api/attendance', { method: 'DELETE', body: JSON.stringify({ staffId: Number(select.dataset.staff), date: select.dataset.date }) });
+      await api('/api/attendance', { method: 'DELETE', body: JSON.stringify({ staffId: select.dataset.staff, date: select.dataset.date }) });
       toast('Attendance mark cleared.');
     } else {
-      await api('/api/attendance', { method: 'PUT', body: JSON.stringify({ staffId: Number(select.dataset.staff), date: select.dataset.date, status: select.value }) });
+      await api('/api/attendance', { method: 'PUT', body: JSON.stringify({ staffId: select.dataset.staff, date: select.dataset.date, status: select.value }) });
       toast(`Marked ${select.value}.`);
     }
     select.className = `mark-select ${select.value}`; select.dataset.previous = select.value;
   } catch (error) { select.value = previous; toast(error.message, true); }
 });
 
-showApp('Cafe Paris Team');
+initialize();
