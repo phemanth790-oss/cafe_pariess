@@ -50,7 +50,7 @@ The existing local SQLite file is not imported. The Atlas database starts empty;
 npm run check
 ```
 
-Import the repository into Vercel with the Root Directory set to the repository root (not `public/`). Vercel serves `public/` as static files and uses the explicit API function entry points under `api/`, which delegate to the Express application; no separate build output directory is needed. Add these environment variables in the Vercel project settings for Production (and Preview if needed):
+Import the repository into Vercel with the Root Directory set to the repository root (not `public/`) and leave the Output Directory unset. The included `vercel.json` builds explicit Node.js functions from `api/` and static assets from `public/`. Add these environment variables in the Vercel project settings for Production (and Preview if needed):
 
 - `MONGODB_URI` — the Atlas connection string.
 - `MONGODB_DB` — the database name, for example `cafe_paris`.
