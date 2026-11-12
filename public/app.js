@@ -27,7 +27,10 @@ async function api(url, options = {}) {
     if (response.status === 401 && data?.error === 'Sign in to continue.' && state.user) {
       showLogin('Your session expired. Sign in again.');
     }
-    const error = new Error(data?.error || data || 'Something went wrong.');
+    const message = response.status === 404 && !type.includes('application/json')
+      ? 'The API route was not found. Check Vercel routing and redeploy from the repository root.'
+      : data?.error || data || 'Something went wrong.';
+    const error = new Error(message);
     error.status = response.status;
     throw error;
   }

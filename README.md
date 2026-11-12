@@ -17,6 +17,7 @@ A responsive staff attendance application built with HTML, CSS, JavaScript, Node
 - Monthly employee summaries and CSV export.
 - Responsive layout for desktop, tablet and mobile.
 - Staff and attendance data stored in MongoDB Atlas.
+- Bundled cafe photography from Unsplash.
 
 ## Requirements
 
@@ -49,7 +50,7 @@ The existing local SQLite file is not imported. The Atlas database starts empty;
 npm run check
 ```
 
-Import the repository into Vercel with the project root set to this directory. Vercel serves `public/` as static files and routes `/api/*` to the Express function in `api/[...path].js`; no separate build output directory is needed. Add these environment variables in the Vercel project settings for Production (and Preview if needed):
+Import the repository into Vercel with the Root Directory set to the repository root (not `public/`). Vercel serves `public/` as static files and uses the explicit API function entry points under `api/`, which delegate to the Express application; no separate build output directory is needed. Add these environment variables in the Vercel project settings for Production (and Preview if needed):
 
 - `MONGODB_URI` — the Atlas connection string.
 - `MONGODB_DB` — the database name, for example `cafe_paris`.
